@@ -1,0 +1,6 @@
+[submodule "ext/core"]
+	path = ext/core
+	url = https://github.com/mupen64plus/mupen64plus-core.git
+[submodule "ext/OpenXR-SDK"]
+	path = ext/OpenXR-SDK
+	url = https://github.com/KhronosGroup/OpenXR-SDK.git
