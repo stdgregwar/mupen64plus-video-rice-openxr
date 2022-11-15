@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef _OGL_RENDER_H_
 #define _OGL_RENDER_H_
 
+#include <optional>
 #include "Combiner.h"
 #include "RSP_S2DEX.h"
 #include "Render.h"
@@ -26,6 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "osal_opengl.h"
 #include "osal_preproc.h"
 #include "typedefs.h"
+#include "OXRContext.h"
 
 class CTexture;
 struct TxtrCacheEntry;
@@ -66,6 +68,7 @@ public:
     void UpdateScissor();
     void ApplyRDPScissor(bool force=false);
     void ApplyScissorWithClipRatio(bool force=false);
+    void ApplyEyeMatrices();
 
     bool SetCurrentTexture(int tile, CTexture *handler,uint32 dwTileWidth, uint32 dwTileHeight, TxtrCacheEntry *pTextureEntry);
     bool SetCurrentTexture(int tile, TxtrCacheEntry *pTextureEntry);
@@ -84,6 +87,7 @@ public:
 
     void SetFogColor(uint32 r, uint32 g, uint32 b, uint32 a);
 
+    void BeginRendering(void);
     void EndRendering(void);
 
     void glViewportWrapper(GLint x, GLint y, GLsizei width, GLsizei height, bool flag=true);
@@ -103,6 +107,8 @@ protected:
 
     GLint m_maxTexUnits;
     int m_textureUnitMap[8];
+
+    std::optional<OXRContext> oxrCtx;
 };
 
 #endif

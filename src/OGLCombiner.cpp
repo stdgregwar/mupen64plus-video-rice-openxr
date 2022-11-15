@@ -62,7 +62,10 @@ static char newFrgStr[4092]; // The main buffer for store fragment shader string
 
 static const char *vertexShaderStr =
 "#version " GLSL_VERSION "\n"
+"#extension GL_EXT_draw_instanced : enable\n"
+"#extension GL_AMD_vertex_shader_layer : enable\n"
 "uniform vec2 uFogMinMax;\n"
+"uniform mat4 uEyes[2];\n"
 "\n"
 "attribute vec4 inPosition;\n"
 "attribute vec2 inTexCoord0;\n"
@@ -74,10 +77,13 @@ static const char *vertexShaderStr =
 "varying vec2 vertexTexCoord1;\n"
 "varying float vertexFog;\n"
 "varying vec4 vertexShadeColor;\n"
+"varying vec4 n64clip;\n"
 "\n"
 "void main()\n"
 "{\n"
-"gl_Position = inPosition;\n"
+"gl_Layer = gl_InstanceID;\n"
+"gl_Position = uEyes[gl_InstanceID] * inPosition;\n"
+"n64clip = inPosition;\n"
 "vertexTexCoord0 = inTexCoord0;\n"
 "vertexTexCoord1 = inTexCoord1;\n"
 "vertexFog = clamp((uFogMinMax[1] - inFog) / (uFogMinMax[1] - uFogMinMax[0]), 0.0, 1.0);\n"
@@ -112,9 +118,11 @@ static const char *fragmentShaderHeader =
 "varying vec2 vertexTexCoord1;\n"
 "varying float vertexFog;\n"
 "varying vec4 vertexShadeColor;\n"
+"varying vec4 n64clip;\n"
 "\n"
 "void main()\n"
 "{\n"
+"if(abs(n64clip.x) > n64clip.w || abs(n64clip.y) > n64clip.w){discard;}\n"
 "vec4 outColor;\n";
 
 //Fragment shader for InitCycleCopy
@@ -1255,6 +1263,24 @@ void COGLColorCombiner::GenerateCombinerSettingConstants( int shaderId )
         OPENGL_CHECK_ERRORS;
     }
 
+    if( saveType.eyesLoc != CC_INACTIVE_UNIFORM ) {
+        //glUniform2f( saveType.fogMaxMinLoc, gRSPfFogMin ,
+        //                                     gRSPfFogMax );
+        /*float identities[32]{
+          1, 0, 0, 0,
+          0, 1, 0, 0,
+          0, 0, 1, 0,
+          0, 0, 0, 1,
+          1, 0, 0, 0,
+          0, 1, 0, 0,
+          0, 0, 1, 0,
+          0, 0, 0, 1,
+        };*/
+        m_pOGLRender->ApplyEyeMatrices();
+        glUniformMatrix4fv(saveType.eyesLoc, 2, GL_FALSE, gOXREyeMatrices[0]);
+        OPENGL_CHECK_ERRORS;
+    }
+
     // Fragment shader
     if(    saveType.blendColorLoc != CC_INACTIVE_UNIFORM ) {
         glUniform4f( saveType.blendColorLoc, gRDP.fvBlendColor[0],
@@ -1379,6 +1405,7 @@ void COGLColorCombiner::StoreUniformLocations( ShaderSaveType &saveType )
     saveType.tex0Loc            = glGetUniformLocation( saveType.program, "uTex0"            );
     saveType.tex1Loc            = glGetUniformLocation( saveType.program, "uTex1"            );
     saveType.fogColorLoc        = glGetUniformLocation( saveType.program, "uFogColor"        );
+    saveType.eyesLoc            = glGetUniformLocation( saveType.program, "uEyes"            );
 }
 
 // Return a shader id that match the current state in the current compiled shader "database".

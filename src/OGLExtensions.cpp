@@ -68,6 +68,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
     INIT_EMPTY_FUNC(PFNGLUNIFORM1FPROC,                glUniform1f)
     INIT_EMPTY_FUNC(PFNGLUNIFORM1IPROC,                glUniform1i)
     INIT_EMPTY_FUNC(PFNGLUSEPROGRAMPROC,               glUseProgram)
+
+    INIT_EMPTY_FUNC(PFNGLCLIPCONTROLPROC,              glClipControl)
+    INIT_EMPTY_FUNC(PFNGLUNIFORMMATRIX4FVPROC,         glUniformMatrix4fv)
+    INIT_EMPTY_FUNC(PFNGLDRAWELEMENTSINSTANCEDPROC,    glDrawElementsInstanced)
+    INIT_EMPTY_FUNC(PFNGLGENFRAMEBUFFERSPROC,          glGenFramebuffers)
+    INIT_EMPTY_FUNC(PFNGLBINDFRAMEBUFFERPROC,          glBindFramebuffer)
+    INIT_EMPTY_FUNC(PFNGLBLITFRAMEBUFFERPROC,          glBlitFramebuffer)
+    INIT_EMPTY_FUNC(PFNGLFRAMEBUFFERTEXTUREPROC,       glFramebufferTexture)
+    INIT_EMPTY_FUNC(PFNGLCHECKFRAMEBUFFERSTATUSPROC,   glCheckFramebufferStatus)
 #elif defined(__APPLE__)
     // OSX already support OpenGL 2.1 functions.
 #else
@@ -135,6 +144,16 @@ void OGLExtensions_Init(void)
     INIT_GL_FUNC(PFNGLUNIFORM1FPROC,                glUniform1f)
     INIT_GL_FUNC(PFNGLUNIFORM1IPROC,                glUniform1i)
     INIT_GL_FUNC(PFNGLUSEPROGRAMPROC,               glUseProgram)
+
+    INIT_GL_FUNC(PFNGLCLIPCONTROLPROC,              glClipControl)
+    INIT_GL_FUNC(PFNGLUNIFORMMATRIX4FVPROC,         glUniformMatrix4fv)
+    INIT_GL_FUNC(PFNGLDRAWELEMENTSINSTANCEDPROC,    glDrawElementsInstanced)
+    INIT_GL_FUNC(PFNGLGENFRAMEBUFFERSPROC,          glGenFramebuffers)
+    INIT_GL_FUNC(PFNGLGENFRAMEBUFFERSPROC,          glGenFramebuffers)
+    INIT_GL_FUNC(PFNGLBINDFRAMEBUFFERPROC,          glBindFramebuffer)
+    INIT_GL_FUNC(PFNGLBLITFRAMEBUFFERPROC,          glBlitFramebuffer)
+    INIT_GL_FUNC(PFNGLFRAMEBUFFERTEXTUREPROC,       glFramebufferTexture)
+    INIT_GL_FUNC(PFNGLCHECKFRAMEBUFFERSTATUSPROC,   glCheckFramebufferStatus)
 #elif defined(__APPLE__)
     // empty
 #else

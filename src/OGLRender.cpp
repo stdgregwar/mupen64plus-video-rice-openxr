@@ -113,6 +113,11 @@ void OGLRender::Initialize(void)
         OPENGL_CHECK_ERRORS;
     }
 #endif
+
+    //Init OXR
+    if(!oxrCtx) {
+      oxrCtx.emplace();
+    }
 }
 //===================================================================
 TextureFilterMap OglTexFilterMap[2]=
@@ -219,7 +224,7 @@ void OGLRender::ZBufferEnable(BOOL bZBuffer)
         glDepthMask(GL_TRUE);
         OPENGL_CHECK_ERRORS;
         //glEnable(GL_DEPTH_TEST);
-        glDepthFunc( GL_LEQUAL );
+        glDepthFunc( GL_GEQUAL );
         OPENGL_CHECK_ERRORS;
     }
     else
@@ -238,7 +243,7 @@ void OGLRender::ClearBuffer(bool cbuffer, bool zbuffer)
     if( cbuffer )   flag |= GL_COLOR_BUFFER_BIT;
     if( zbuffer )   flag |= GL_DEPTH_BUFFER_BIT;
     float depth = ((gRDP.originalFillColor&0xFFFF)>>2)/(float)0x3FFF;
-    glClearDepth(depth);
+    glClearDepth(1-depth);
     OPENGL_CHECK_ERRORS;
     glClear(flag);
     OPENGL_CHECK_ERRORS;
@@ -247,7 +252,7 @@ void OGLRender::ClearBuffer(bool cbuffer, bool zbuffer)
 void OGLRender::ClearZBuffer(float depth)
 {
     uint32 flag=GL_DEPTH_BUFFER_BIT;
-    glClearDepth(depth);
+    glClearDepth(1-depth);
     OPENGL_CHECK_ERRORS;
     glClear(flag);
     OPENGL_CHECK_ERRORS;
@@ -262,7 +267,7 @@ void OGLRender::SetZCompare(BOOL bZCompare)
     if( bZCompare == TRUE )
     {
         //glEnable(GL_DEPTH_TEST);
-        glDepthFunc( GL_LEQUAL );
+        glDepthFunc( GL_GEQUAL );
         OPENGL_CHECK_ERRORS;
     }
     else
@@ -692,6 +697,17 @@ bool OGLRender::RenderLine3D()
     return true;
 }
 
+void OGLRender::ApplyEyeMatrices(){
+   auto oxrMatrices = oxrCtx->getVPMatrices(gRSP.projectionMtxs[GetProjectMatrixLevel()]);
+   static Matrix identity(
+         1, 0, 0, 0,
+         0, 1, 0, 0,
+         0, 0, 1, 0,
+         0, 0, 0, 1);
+   gOXREyeMatrices[0] = oxrMatrices.at(0);// * GetWorldProjectMatrix();
+   gOXREyeMatrices[1] = oxrMatrices.at(1);// * GetWorldProjectMatrix(); //TODO
+}
+
 extern FiddledVtx * g_pVtxBase;
 
 // This is so weired that I can not do vertex transform by myself. I have to use
@@ -705,7 +721,8 @@ bool OGLRender::RenderFlushTris()
 
     //if options.bOGLVertexClipper == FALSE )
     {
-        glDrawElements( GL_TRIANGLES, gRSP.numVertices, GL_UNSIGNED_SHORT, g_vtxIndex );
+        //glDrawElements( GL_TRIANGLES, gRSP.numVertices, GL_UNSIGNED_SHORT, g_vtxIndex );
+        glDrawElementsInstanced( GL_TRIANGLES, gRSP.numVertices, GL_UNSIGNED_SHORT, g_vtxIndex, 2);
         OPENGL_CHECK_ERRORS;
     }
 /*  else
@@ -867,8 +884,12 @@ void OGLRender::DrawSimpleRect(int nX0, int nY0, int nX1, int nY1, uint32 dwColo
 
 void OGLRender::SetViewportRender()
 {
+  if(oxrCtx){
+    oxrCtx->SetViewportRender();
+  } else {
     glViewportWrapper(windowSetting.vpLeftW, windowSetting.uDisplayHeight-windowSetting.vpTopW-windowSetting.vpHeightW+windowSetting.statusBarHeightToUse, windowSetting.vpWidthW, windowSetting.vpHeightW);
     OPENGL_CHECK_ERRORS;
+  }
 }
 
 void OGLRender::RenderReset()
@@ -992,6 +1013,12 @@ void OGLRender::SetFogColor(uint32 r, uint32 g, uint32 b, uint32 a)
     gRDP.fvFogColor[3] = a/255.0f;      //a
 }
 
+void OGLRender::BeginRendering(void) {
+  CRender::BeginRendering();
+
+  if(oxrCtx) oxrCtx->frameStart();
+}
+
 void OGLRender::EndRendering(void)
 {
 #ifndef USE_GLES
@@ -1000,12 +1027,18 @@ void OGLRender::EndRendering(void)
 #endif
     if( CRender::gRenderReferenceCount > 0 ) 
         CRender::gRenderReferenceCount--;
+
+    if(oxrCtx) oxrCtx->frameEnd();
 }
 
 // TODO: Seems to be useless now.
 void OGLRender::glViewportWrapper(GLint x, GLint y, GLsizei width, GLsizei height, bool flag)
 {
-    
+    if(oxrCtx) {
+      oxrCtx->SetViewportRender();
+      return;
+    }
+
     static GLint mx=0,my=0;
     static GLsizei m_width=0, m_height=0;
     static bool mflag=true;

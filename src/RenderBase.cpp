@@ -157,6 +157,7 @@ unsigned int        g_minIndex, g_maxIndex;
 float               gRSPfFogMin;
 float               gRSPfFogMax;
 float               gRSPfFogDivider;
+ALIGN(16, Matrix   gOXREyeMatrices[2]);
 
 uint32          gRSPnumLights;
 Light   gRSPlights[16];
@@ -1541,7 +1542,8 @@ bool IsTriangleVisible(uint32 dwV0, uint32 dwV1, uint32 dwV2)
             fDirection = fDirection * v1.w * v2.w * v0.w;
             //float fDirection = v0.x*v1.y-v1.x*v0.y+v1.x*v2.y-v2.x*v1.y+v2.x*v0.y-v0.x*v2.y;
 
-            if (fDirection < 0 && gRSP.bCullBack)
+            // TODO CREAL CHECK
+            /*if (fDirection < 0 && gRSP.bCullBack)
             {
                 status.dwNumTrisClipped++;
                 return false;
@@ -1550,7 +1552,7 @@ bool IsTriangleVisible(uint32 dwV0, uint32 dwV1, uint32 dwV2)
             {
                 status.dwNumTrisClipped++;
                 return false;
-            }
+            }*/
         }
     }
     

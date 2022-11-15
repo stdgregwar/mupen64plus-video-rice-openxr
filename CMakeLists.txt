@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.1)
 set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
-project(mupen64plus-video-rice-oxr VERSION 0.0.1
+project(mupen64plus-video-rice-openxr VERSION 0.0.1
 	DESCRIPTION "CREAL's lighfield sample"
   LANGUAGES C CXX)
 
@@ -32,6 +32,8 @@ add_library(mupen64plus-video-rice-openxr SHARED
 	${SRCDIR}/OGLCombiner.cpp
 	${SRCDIR}/OGLExtensions.cpp
 	${SRCDIR}/OGLGraphicsContext.cpp
+  ${SRCDIR}/OXRContext.cpp
+  ${SRCDIR}/OXRContext.h
 	${SRCDIR}/OGLRender.cpp
 	${SRCDIR}/OGLRenderExt.cpp
 	${SRCDIR}/OGLTexture.cpp
@@ -51,9 +53,17 @@ add_library(mupen64plus-video-rice-openxr SHARED
 	${SRCDIR}/Video.cpp
 )
 
-target_compile_definitions(mupen64plus-video-rice-openxr PUBLIC -DNO_ASM)
+file(GLOB HEADERS ${SRCDIR}/*.h)
+target_sources(mupen64plus-video-rice-openxr PUBLIC ${HEADERS})
 
-target_link_libraries(mupen64plus-video-rice-openxr PUBLIC SDL2::SDL2 png)
+target_compile_definitions(mupen64plus-video-rice-openxr PUBLIC -DNO_ASM)
+#target_compile_definitions(mupen64plus-video-rice-openxr PUBLIC -DDEBUGGER)
+
+# OpenXR defines
+target_compile_definitions(mupen64plus-video-rice-openxr PUBLIC XR_USE_PLATFORM_WIN32 XR_USE_GRAPHICS_API_OPENGL)
+target_compile_definitions(mupen64plus-video-rice-openxr PUBLIC GLM_FORCE_RADIANS GLM_FORCE_DEPTH_ZERO_TO_ONE)
+
+target_link_libraries(mupen64plus-video-rice-openxr PUBLIC openxr_loader SDL2::SDL2 png fmt)
 find_package(OpenGL)
 
 if(WIN32)

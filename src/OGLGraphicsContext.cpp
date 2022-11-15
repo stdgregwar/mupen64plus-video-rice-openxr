@@ -252,7 +252,7 @@ void COGLGraphicsContext::InitState(void)
     glDisable(GL_NORMALIZE);
     OPENGL_CHECK_ERRORS;
 #endif
-    glDepthFunc(GL_LEQUAL);
+    glDepthFunc(GL_GEQUAL);
     OPENGL_CHECK_ERRORS;
     glEnable(GL_DEPTH_TEST);
     OPENGL_CHECK_ERRORS;
@@ -433,7 +433,7 @@ void COGLGraphicsContext::UpdateFrame(bool swaponly)
 
     glDepthMask(GL_TRUE);
     OPENGL_CHECK_ERRORS;
-    glClearDepth(1.0f);
+    glClearDepth(0.0f);
     OPENGL_CHECK_ERRORS;
     if( !g_curRomInfo.bForceScreenClear )
     {

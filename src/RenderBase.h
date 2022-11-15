@@ -94,6 +94,9 @@ extern float              gRSPfFogMin;
 extern float              gRSPfFogMax;
 extern float              gRSPfFogDivider;
 
+// OXR eyes matrices
+extern ALIGN(16, Matrix   gOXREyeMatrices[2]);
+
 /************************************************************************/
 /*      Don't move                                                      */
 /************************************************************************/

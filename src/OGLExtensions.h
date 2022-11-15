@@ -59,6 +59,15 @@ void OGLExtensions_Init(void);
     extern PFNGLUNIFORM1FPROC                 glUniform1f;
     extern PFNGLUNIFORM1IPROC                 glUniform1i;
     extern PFNGLUSEPROGRAMPROC                glUseProgram;
+
+    extern PFNGLCLIPCONTROLPROC               glClipControl;
+    extern PFNGLUNIFORMMATRIX4FVPROC          glUniformMatrix4fv;
+    extern PFNGLDRAWELEMENTSINSTANCEDPROC     glDrawElementsInstanced;
+    extern PFNGLGENFRAMEBUFFERSPROC           glGenFramebuffers;
+    extern PFNGLBINDFRAMEBUFFERPROC           glBindFramebuffer;
+    extern PFNGLBLITFRAMEBUFFERPROC           glBlitFramebuffer;
+    extern PFNGLFRAMEBUFFERTEXTUREPROC        glFramebufferTexture;
+    extern PFNGLCHECKFRAMEBUFFERSTATUSPROC    glCheckFramebufferStatus;
 #elif defined(__APPLE__)
     // nothing
 #else
